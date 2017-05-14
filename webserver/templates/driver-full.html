@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/rover.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+        <!-- Place favicon.ico in the root directory -->
+
+        <!-- begin controls -->
+
+        <!--
+        <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
+        <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.12.0.min.js"><\/script>')</script>
+        <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+        -->
+        <!-- end controls -->
+
+        <!-- beginning slider -->
+        <!-- source https://jqueryui.com/slider/ -->
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/jquery-ui.css') }}">
+        <script src="{{ url_for('static', filename='js/jquery-1.12.4.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/jquery-ui-1.12.1.js') }}"></script>
+        <!-- end slider -->
+    </head>
+    <body>
+        <!--[if lt IE 8]>
+            <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+
+        <!-- Add your site or application content here -->
+        <div class="jumbotron">
+            <div class="container">
+                <h1>Raspberry Pi Internet 'Thing' Part 3</h1>
+                <p>Hello world! Welcome to my internet thing!</p>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h3>Direction</h3>
+                    <button class="btn btn-default" type='button' id='direction_forward'>Move forward</button>
+                    <button class="btn btn-default" type='button' id='direction_backward'>Move backward</button>
+                    <button class="btn btn-default" type='button' id='direction_left'>Move left</button>
+                    <button class="btn btn-default" type='button' id='direction_right'>Move right</button>
+                    <button class="btn btn-default" type='button' id='direction_stop'>Move stop</button>
+                    <div id="direction-box"></div>
+                </div>
+
+                <div class="col-md-4">
+                  <h3>Camera</h3>
+                </div>
+                <div class="col-md-4">
+                    <h3>View</h3>
+                    <button class="btn btn-default" type='button' id='view_up'>View up</button>
+                    <button class="btn btn-default" type='button' id='view_down'>View down</button>
+                    <button class="btn btn-default" type='button' id='view_left'>View left</button>
+                    <button class="btn btn-default" type='button' id='view_right'>View right</button>
+
+                    <div class="view-controls">
+
+                        <!-- <p>
+                          <label for="vposition">Vertical:</label>
+                          <input type="text" id="vposition" readonly style="border:0; color:#f6931f; font-weight:bold;">
+                        </p> -->
+                        <div id="slider-vertical"></div>
+
+
+                        <!-- SERVO_V_MIN {{ servo_v_min }}
+                        <label for="positionx">positionx:</label> -->
+                        <!-- <input type="text" id="positionx" readonly style="border:0; color:#f6931f; font-weight:bold;"\> -->
+                        <div id="view-pad"></div>
+
+                        <!-- <p>
+                          <label for="hposition">Horizontal:</label>
+                          <input type="text" id="hposition" readonly style="border:0; color:#f6931f; font-weight:bold;">
+                        </p> -->
+                        <div id="slider-horizontal"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+          $(document).ready(function() {
+
+            // direction
+            $("#direction-box").mousemove(function(e) {
+
+              // define elements
+              var offset = $(this).offset();
+
+              // define pad dimensions
+              var $this = $(this);
+              var pad_width = $this.width();
+              var pad_height = $this.height();
+
+              // define relative mouse position
+              var relativeX = (e.pageX - offset.left);
+              var relativeY = (e.pageY - offset.top);
+
+              // define pad center
+              var AbsoluteCenterX = pad_width / 2;
+              var AbsoluteCenterY = pad_height / 2;
+
+              // define cartesian position
+              var AbsoluteX = relativeX - AbsoluteCenterX;
+              var AbsoluteY = relativeY - AbsoluteCenterY;
+
+              //define servo range
+              var servo_x_min = {{ servo_x_min }};
+              var servo_x_max = {{ servo_x_max }};
+              var servo_y_min = {{ servo_y_min }};
+              var servo_y_max = {{ servo_y_max }};
+
+              var rangeX = servo_x_max - servo_x_min;
+              var rangeY = servo_y_max - servo_y_min;
+
+
+
+              var percentageX = ((100 / pad_width ) * AbsoluteX)*2;
+              var percentageY = ((100 / pad_height ) * AbsoluteY)*2;
+
+              var frequencyX = ((rangeX / 100) * percentageX) + servo_x_min;
+              var frequencyY = ((rangeY / 100) * percentageY) + servo_y_min;
+
+              //define center
+              var centerX = offset.left + pad_width / 2;
+              var centerY = offset.top + pad_height / 2;
+
+              console.log("X: " + relativeX);
+              console.log("Y: " + relativeY);
+              console.log("centerX: " + centerX);
+              console.log("centerY: " + centerY);
+              console.log("AbsoluteCenterX: " + AbsoluteCenterX);
+              console.log("AbsoluteCenterY: " + AbsoluteCenterY);
+              console.log("AbsoluteX: " + AbsoluteX);
+              console.log("AbsoluteY: " + AbsoluteY);
+              console.log("relativeX: " + relativeX);
+              console.log("relativeY: " + relativeY);
+              console.log("percentageX: " + percentageX);
+              console.log("percentageY: " + percentageY);
+              console.log("----------------------------\n");
+
+
+                $.post("/control/direction/combined",
+                {
+                    directionX: percentageX,
+                    directionY: percentageY,
+                },
+                function(data, status){
+                    //alert("Data: " + data + "\nStatus: " + status);
+                });
+
+            });
+
+            $("#direction-box").mouseleave(function(e) {
+              console.log("Out of the pad");;
+              $.post("/control/direction/stop",
+              {
+                  frequencyX: {{ servo_x_start }},
+                  frequencyY: {{ servo_y_start }},
+              },
+              function(data, status){
+                  //alert("Data: " + data + "\nStatus: " + status);
+              });
+            });
+
+            // box position
+
+            //$("#view-pad").click(function(e) {
+            //$("#view-pad").hover(function(e) {
+            $("#view-pad").mousemove(function(e) {
+
+              // define elements
+              var offset = $(this).offset();
+
+              // define pad dimensions
+              var $this = $(this);
+              var pad_width = $this.width();
+              var pad_height = $this.height();
+
+              // define relative mouse position
+              var relativeX = (e.pageX - offset.left);
+              var relativeY = (e.pageY - offset.top);
+
+              // define pad center
+              var AbsoluteCenterX = pad_width / 2;
+              var AbsoluteCenterY = pad_height / 2;
+
+              // define cartesian position
+              var AbsoluteX = relativeX - AbsoluteCenterX;
+              var AbsoluteY = relativeY - AbsoluteCenterY;
+
+              //define servo range
+              var servo_x_min = {{ servo_x_min }};
+              var servo_x_max = {{ servo_x_max }};
+              var servo_y_min = {{ servo_y_min }};
+              var servo_y_max = {{ servo_y_max }};
+
+              var rangeX = servo_x_max - servo_x_min;
+              var rangeY = servo_y_max - servo_y_min;
+
+
+              var percentageX = (100 / pad_width ) * relativeX;
+              var percentageY = (100 / pad_height ) * relativeY;
+
+              var frequencyX = ((rangeX / 100) * percentageX) + servo_x_min;
+              var frequencyY = ((rangeY / 100) * percentageY) + servo_y_min;
+
+              //define center
+              var centerX = offset.left + pad_width / 2;
+              var centerY = offset.top + pad_height / 2;
+
+              //alert("X: " + relativeX + "  Y: " + relativeY);
+              //$( "#hposition" ).val( $( "#slider-horiziontal" ).slider( "value" ) );
+
+              //$( "#view-pad" ).val( $( "#positionx" ).relativeX );
+              //$( "#positionx" ).value(item.relativeX) ;
+              //$( "#positionx" ).value('item.relativeX') ;
+              console.log("X: " + relativeX);
+              console.log("Y: " + relativeY);
+              console.log("centerX: " + centerX);
+              console.log("centerY: " + centerY);
+              console.log("AbsoluteCenterX: " + AbsoluteCenterX);
+              console.log("AbsoluteCenterY: " + AbsoluteCenterY);
+              console.log("AbsoluteX: " + AbsoluteX);
+              console.log("AbsoluteY: " + AbsoluteY);
+              console.log("relativeX: " + relativeX);
+              console.log("relativeY: " + relativeY);
+              console.log("percentageX: " + percentageX);
+              console.log("frequencyX: " + frequencyX);
+              console.log("----------------------------\n");
+
+
+                $.post("/control/view/combined",
+                {
+                    frequencyX: frequencyX,
+                    frequencyY: frequencyY,
+                },
+                function(data, status){
+                    //alert("Data: " + data + "\nStatus: " + status);
+                });
+
+            });
+
+            $("#view-pad").mouseleave(function(e) {
+              console.log("Out of the pad");
+              console.log("X: 0");
+              console.log("Y: 0");
+              console.log("----------------------------\n");
+              $.post("/control/view/reset",
+              {
+                  frequencyX: {{ servo_x_start }},
+                  frequencyY: {{ servo_y_start }},
+              },
+              function(data, status){
+                  //alert("Data: " + data + "\nStatus: " + status);
+              });
+            });
+
+            //end box position
+
+
+
+            // Setup control directions
+            $('#direction_forward').click(function() {
+              $.post('/control/direction/forward');
+            });
+            $('#direction_backward').click(function() {
+              $.post('/control/direction/backward');
+            });
+            $('#direction_left').click(function() {
+              $.post('/control/direction/left');
+            });
+            $('#direction_right').click(function() {
+              $.post('/control/direction/right');
+            });
+            $('#direction_stop').click(function() {
+              $.post('/control/direction/stop');
+            });
+
+            // Setup view directions
+            $('#view_up').click(function() {
+              $.post('/control/view/up');
+            });
+            $('#view_down').click(function() {
+              $.post('/control/view/down');
+            });
+            $('#view_left').click(function() {
+              $.post('/control/view/left');
+            });
+            $('#view_right').click(function() {
+              $.post('/control/view/right');
+            });
+
+            console.log( "readyv" );
+            console.log( "insidev" );
+            $( "#slider-vertical" ).slider({
+              orientation: "vertical",
+              range: "min",
+              min: {{ servo_y_min }},
+              max: {{ servo_y_max }},
+              value: {{ servo_y_start }},
+              step: 10,
+              //step: 1,
+
+              slide: function( event, ui ) {
+                // Doing the fun!!!
+                var yyy = ui.value;
+                $.post("/control/view/combined",
+                {
+                    frequencyY: ui.value,
+                    frequencyX: 700
+                },
+                function(data, status){
+                    //alert("Data: " + data + "\nStatus: " + status);
+                });
+                console.log( ui.value );
+                $( "#vposition" ).val( ui.value );
+              }
+            });
+            $( "#vposition" ).val( $( "#slider-vertical" ).slider( "value" ) );
+
+            console.log( "ready h!" );
+            console.log( "inside h" );
+            $( "#slider-horizontal" ).slider({
+              orientation: "horizontal",
+              range: "min",
+              min: {{ servo_x_min }},
+              max: {{ servo_x_max }},
+              value: {{ servo_x_start }},
+              step: 1,
+              //step: 1,
+              slide: function( event, ui, yyy ) {
+                // Doing the fun!!!
+                $.post("/control/view/combined",
+                {
+                    frequencyX: ui.value,
+                    frequencyY: 700,
+                },
+                function(data, status){
+                    //alert("Data: " + data + "\nStatus: " + status);
+                });
+                console.log( ui.value );
+                $( "#hposition" ).val( ui.value );
+              }
+            });
+            $( "#hposition" ).val( $( "#slider-horiziontal" ).slider( "value" ) );
+        });
+        </script>
+    </body>
+</html>

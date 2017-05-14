@@ -1,0 +1,41 @@
+#view-pad {
+  height: 270px;
+  width: 270px;
+  border: 1px solid black;
+  margin: 0 0 5px 15px
+}
+
+#direction-box {
+  height: 300px;
+  width: 300px;
+  border: 1px solid black;
+}
+
+#slider-vertical {
+  float: left;
+  height: 270px;
+}
+
+#slider-horizontal {
+  width: 270px;
+  margin-left: 15px;
+}
+
+/*Cardboard SECTION*/
+html {
+  height: 100%;
+}
+body {
+  min-height: 100%;
+  margin: 0;
+}
+.cardboard-main {
+  height: 545px;
+}
+.cardboard-iframe {
+  width: 49%;
+  /*border: 1px solid black;*/
+  border: 0;
+  float: left;
+  height: 100%;
+}

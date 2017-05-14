@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="">
+    <head>
+        <title></title>
+        <meta name="description" content="">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/rover.css') }}">
+        <script src="{{ url_for('static', filename='js/jquery-1.12.4.js') }}"></script>
+<script>
+    // $( document ).ready(function() {
+    //     console.log( "document loaded" );
+    //     alert("loaded");
+    // });
+    //
+    // $( window ).load(function() {
+    //     console.log( "window loaded" );
+    //     alert("loaded");
+    // });
+</script>
+    </head>
+    <body id="body">
+
+
+        <div class="cardboard-main" id="cardboardmain">
+          <iframe class="cardboard-iframe" frameborder="0" src="http://192.168.10.1:8080/stream?width=480&height=550"></iframe>
+          <button id="enablefs">Enable fullscreen</button>
+          <iframe class="cardboard-iframe" src="http://192.168.10.1:8080/stream?width=480&height=550"></iframe>
+        </div>
+
+<script>
+
+    var i = document.getElementById("cardboardmain");
+    var x = document.getElementById("cardboardmain");
+  	// click event handler
+  	x.onclick = function() {
+    // alert('zz');
+		// in full-screen?
+		// if (
+		// 	document.fullscreenElement ||
+		// 	document.webkitFullscreenElement ||
+		// 	document.mozFullScreenElement ||
+		// 	document.msFullscreenElement
+		// ) {
+
+			// // exit full-screen
+			// if (document.exitFullscreen) {
+			// 	document.exitFullscreen();
+			// } else if (document.webkitExitFullscreen) {
+			// 	document.webkitExitFullscreen();
+			// } else if (document.mozCancelFullScreen) {
+			// 	document.mozCancelFullScreen();
+			// } else if (document.msExitFullscreen) {
+			// 	document.msExitFullscreen();
+			// }
+
+		// }
+		// else {
+
+			// go full-screen
+			if (i.requestFullscreen) {
+				this.requestFullscreen();
+			} else if (i.webkitRequestFullscreen) {
+				i.webkitRequestFullscreen();
+			} else if (i.mozRequestFullScreen) {
+				i.mozRequestFullScreen();
+			} else if (i.msRequestFullscreen) {
+				i.msRequestFullscreen();
+			}
+
+		// }
+
+	} //finish onclick
+          // });
+
+if (window.DeviceOrientationEvent) {
+
+		window.addEventListener("deviceorientation", function(event)
+		{
+      var valueAlpha = event.alpha;
+      var absolute = event.absolute;
+			// var xValue = Math.round(event.alpha);
+      var valuegamma = Math.round(event.gamma);   //  y axis
+      var valuebeta = Math.round(event.beta);    //  rotation
+      // console.log(xValue);
+
+      $.post("/control/view/gyroscope",
+      {
+          valueAlpha: valueAlpha,
+          absolute: absolute,
+          valuegamma: valuegamma,
+          valuebeta: valuebeta,
+      },
+      function(data, status){
+          //alert("Data: " + data + "\nStatus: " + status);
+      });
+
+		}, true);
+} else {
+	 alert("Sorry, your browser doesn't support Device Orientation");
+}
+
+    // // This is just a quick check for the accelerometer
+    // if (window.DeviceMotionEvent == undefined) {
+    //     //No accelerometer is present. Use buttons.
+    //     alert("no accelerometer");
+    // }
+    // else {
+    //     alert("accelerometer found");
+    //     window.addEventListener("devicemotion", accelerometerUpdate, true);
+    // }
+    // // end accelerometer check
+        </script>
+    </body>
+</html>
