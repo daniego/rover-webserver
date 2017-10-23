@@ -1,0 +1,54 @@
+# FROM node:latest
+FROM hypriot/rpi-node
+
+# RUN \
+#     mkdir /streaming && \
+#     git clone https://github.com/ricohapi/video-streaming-sample-app.git /streaming
+#
+# # USER node
+# RUN cd /streaming/samples && \
+#     npm install && \
+#     npm run build
+#
+# RUN cd /streaming/samples/oneway-broadcast && \
+#     cp ../config_template.js ./config.js && \
+#     npm install
+#
+# RUN apt update && apt install -y firefox-esr xvfb vim
+#
+# RUN echo "const CONFIG = {  clientId: '111',  clientSecret: '111',};const USER = {  userId: '111',  userPass: '11',};" > /streaming/samples/oneway-broadcast/config.js
+#
+#
+#
+# RUN npm install http-server -g
+# RUN mkdir /ThetaSphericalMapping && git clone https://github.com/izmhr/ThetaSphericalMapping.git /ThetaSphericalMapping
+#
+#
+# RUN cd /streaming/samples/oneway-watch && \
+#     cp ../config_template.js ./config.js && \
+#     npm install
+#
+# RUN echo "const CONFIG = {  clientId: '111',  clientSecret: '111',};const USER = {  userId: '111',  userPass: '11',};" > /streaming/samples/oneway-watch/config.js
+# RUN npm install gulp -g
+# WORKDIR /ThetaSphericalMapping
+
+
+# CMD cd /streaming/samples/oneway-broadcast; npm start
+# Make config.js from config_template.js.
+#
+# $ cd oneway-broadcast
+# $ cp ../config_template.js ./config.js
+# and put your credentials into the config.js.
+#
+# Install Mozilla Firefox(Iceweasel), Xvfb and other packages you need.
+# In Raspbian Jessie, the following command will be executed:
+#
+# $ apt-get install firefox-esr xvfb
+# $ npm install
+
+
+RUN git clone https://github.com/zacharyliu/vr-camera.git /vr-camera
+WORKDIR /vr-camera
+RUN npm install -g bower
+RUN bower install --allow-root webvr-boilerplate
+RUN npm install http-server -g

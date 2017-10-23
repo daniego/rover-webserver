@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+<link rel="import" href="{{ url_for('static', filename='demos/bluetooth-rename/bower_components/paper-progress/paper-progress.html') }}">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+
+    </head>
+    <body>
+        <div class="jumbotron">
+          <div class="container">
+            <h1>web-bluetooth-demo</h1>
+          </div>
+        </div>
+
+
+            <div class="card-content">
+              <button id="connectButton" raised class="colorful">Connect</paper-button>
+            </div>
+
+            <div class="card-content">
+              <button id="getCharacteristicStatus" raised class="colorful">getCharacteristicStatus</paper-button>
+            </div>
+            <paper-card>
+              <div class="card-content">
+                <paper-input id="nameInput" label="Device Name" disabled></paper-input>
+                <paper-button id="writeNameButton" class="colorful" disabled>Update Name</paper-button>
+              </div>
+            </paper-card>
+
+            <paper-dialog id="errorDialog">
+              <h2>Error</h2>
+              <p id="dialogError">Could not connect to bluetooth device!</p>
+            </paper-dialog>
+
+            <script>
+              "use strict";
+              $(document).ready(function()
+              //document.addEventListener('WebComponentsReady', function()
+              {
+
+                function logProgress(x) {
+                  console.log("Progress:", x);
+                  return x;
+                }
+
+                function handleError(error) {
+                  console.log(error);
+                  if (error.toString().match(/User cancelled/))
+                    return;  // User didn't make a choice, no error needed.
+                  else
+                    dialogError.innerText = error;
+                  errorDialog.open();
+                }
+
+                function disableInput() {
+                  nameInput.disabled = true;
+                  nameInput.charCounter = false;
+                  writeNameButton.disabled = true;
+                }
+
+                function enableInput() {
+                  nameInput.disabled = false;
+                  nameInput.charCounter = true;
+                  writeNameButton.disabled = false;
+                }
+
+                function anyDeviceFilter() {
+                  // This is the closest we can get for now to get all devices.
+                  // https://github.com/WebBluetoothCG/web-bluetooth/issues/234
+                  return Array.from('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
+                      .map(c => ({namePrefix: c}))
+                      .concat({name: ''});
+                }
+
+                connectButton.addEventListener('click', function () {
+                  // alert('foo');
+                  // progress.hidden = false;
+                  disableInput();
+                  Promise.resolve()
+                  .then(_ => {
+                    if (!navigator.bluetooth)
+                      throw "No Web Bluetooth support.";
+                    return navigator.bluetooth.requestDevice({
+                      // filters: anyDeviceFilter(),
+                      filters: [{
+                                  name: 'Button'
+                                }],
+                      optionalServices: ['generic_access']
+                    })
+                  })
+                  .then(logProgress)
+                  .then(device => {
+                    nameInput.value = "";
+                    return device.gatt.connect().catch(error => {
+                      logProgress(error);
+                      throw "Unable to connect. Some devices refuse connections.";
+                    });
+                  })
+                  .then(logProgress('wew'))
+                  .then(logProgress)
+                  .then(server => server.getPrimaryService("generic_access"))
+                  .then(logProgress)
+                  .then(service => service.getCharacteristic("gap.device_name"))
+                  .then(logProgress)
+                  .then(characteristic => {
+                    window.deviceName = characteristic;
+                    return characteristic.readValue();
+                  })
+                  .then(logProgress)
+                  .then(value => {
+                    window.value = value;
+                    nameInput.value = new TextDecoder("utf-8").decode(value);
+                    if (window.deviceName.properties.write)
+                      enableInput();
+                    else
+                      throw "Name is not writable on this device.";
+                  })
+                  .catch(handleError)
+                  // .then(_ => progress.hidden = true)
+                });
+
+                getCharacteristicStatus.addEventListener('click', function () {
+                  console.log('status');
+                  navigator.bluetooth.requestDevice({
+                      // filters: anyDeviceFilter(),
+                      filters: [{
+                                  name: 'Glove controller'
+                                }],
+                      Services: ['00001800-0000-1000-8000-00805f9b34fb']
+                    })
+                    .then(device => device.gatt.connect())
+                    .then(server => {
+                      // Getting Battery Service...
+                      return server.getPrimaryService('battery_service');
+                    })
+                    .then(service => {
+                      // Getting Battery Level Characteristic...
+                      return service.getCharacteristic('battery_level');
+                    })
+                    .then(characteristic => {
+                      // Reading Battery Level...
+                      return characteristic.readValue();
+                    })
+                    .then(value => {
+                      console.log('Battery percentage is ' + value.getUint8(0));
+                    })
+                    .catch(error => { console.log(error); });
+                });
+
+
+                // writeNameButton.addEventListener('click', function () {
+                //   progress.hidden = false;
+                //   Promise.resolve()
+                //   .then(_ => {
+                //     let uint8arrayName = new TextEncoder("utf-8").encode(nameInput.value);
+                //     console.log("Writing: ", uint8arrayName);
+                //     return deviceName.writeValue(uint8arrayName)
+                //   })
+                //   .then(logProgress)
+                //   .then(_ => doneDialog.open())
+                //   .catch(handleError)
+                //   .then(_ => progress.hidden = true)
+                // });
+
+
+              });
+            </script>
+    </body>
+</html>

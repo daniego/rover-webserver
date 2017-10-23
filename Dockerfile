@@ -13,7 +13,7 @@ RUN python3 -m venv /opt/rover-webserver && \
     /opt/rover-webserver/bin/pip install -r requirements.txt
 
 RUN echo "source /opt/rover-webserver/bin/activate" >> /root/.bashrc
-
+ 
 
 ADD etc/nginx/sites-enabled/nginx80 /etc/nginx/sites-enabled/nginx80
 RUN rm /etc/nginx/sites-enabled/default

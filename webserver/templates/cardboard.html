@@ -21,9 +21,9 @@
 
 
         <div class="cardboard-main" id="cardboardmain">
-          <iframe class="cardboard-iframe" frameborder="0" src="http://192.168.10.1:8080/stream?width=480&height=550"></iframe>
+          <iframe class="cardboard-iframe" frameborder="0" src="http://192.168.2.6:8080/stream?width=480&height=550"></iframe>
           <button id="enablefs">Enable fullscreen</button>
-          <iframe class="cardboard-iframe" src="http://192.168.10.1:8080/stream?width=480&height=550"></iframe>
+          <iframe class="cardboard-iframe" src="http://192.168.2.6:8080/stream?width=480&height=550"></iframe>
         </div>
 
 <script>
@@ -71,32 +71,34 @@
 	} //finish onclick
           // });
 
-if (window.DeviceOrientationEvent) {
 
-		window.addEventListener("deviceorientation", function(event)
-		{
-      var valueAlpha = event.alpha;
-      var absolute = event.absolute;
-			// var xValue = Math.round(event.alpha);
-      var valuegamma = Math.round(event.gamma);   //  y axis
-      var valuebeta = Math.round(event.beta);    //  rotation
-      // console.log(xValue);
 
-      $.post("/control/view/gyroscope",
-      {
-          valueAlpha: valueAlpha,
-          absolute: absolute,
-          valuegamma: valuegamma,
-          valuebeta: valuebeta,
-      },
-      function(data, status){
-          //alert("Data: " + data + "\nStatus: " + status);
-      });
-
-		}, true);
-} else {
-	 alert("Sorry, your browser doesn't support Device Orientation");
-}
+// if (window.DeviceOrientationEvent) {
+//
+// 		window.addEventListener("deviceorientation", function(event)
+// 		{
+//       var valueAlpha = event.alpha;
+//       var absolute = event.absolute;
+// 			// var xValue = Math.round(event.alpha);
+//       var valuegamma = Math.round(event.gamma);   //  y axis
+//       var valuebeta = Math.round(event.beta);    //  rotation
+//       // console.log(xValue);
+//
+//       $.post("/control/view/gyroscope",
+//       {
+//           valueAlpha: valueAlpha,
+//           absolute: absolute,
+//           valuegamma: valuegamma,
+//           valuebeta: valuebeta,
+//       },
+//       function(data, status){
+//           //alert("Data: " + data + "\nStatus: " + status);
+//       });
+//
+// 		}, true);
+// } else {
+// 	 alert("Sorry, your browser doesn't support Device Orientation");
+// }
 
     // // This is just a quick check for the accelerometer
     // if (window.DeviceMotionEvent == undefined) {
