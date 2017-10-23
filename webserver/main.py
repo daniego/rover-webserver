@@ -1,5 +1,12 @@
 from flask import *
+import os
 
+print(os.getenv('SWARM_IP'))
+print(os.environ.get('SWARM_IP'))
+
+SWARM_IP = os.environ.get("SWARM_IP") + ":8099"
+# SWARM_IP = sSWARM_IP)
+print(SWARM_IP)
 # define servo range
 SERVO_X_MIN = 730
 SERVO_X_MAX = 3200
@@ -23,6 +30,7 @@ def view(service):
     # print service
     if service == 'driver/full':
         return render_template('driver-full.html',
+                                swarm_ip=SWARM_IP,
                                 servo_y_min=SERVO_Y_MIN,
                                 servo_y_max=SERVO_Y_MAX,
                                 servo_y_start=SERVO_Y_START,

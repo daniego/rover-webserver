@@ -52,7 +52,7 @@
                 </div>
 
                 <div class="col-md-4">
-                  <h3>Camera</h3>
+                  <h3>Camera{{ swarm_ip }}</h3>
                 </div>
                 <div class="col-md-4">
                     <h3>View</h3>
@@ -147,7 +147,7 @@
               console.log("----------------------------\n");
 
 
-                $.post("/control/direction/combined",
+                $.post("{{ swarm_ip }}/control/direction/combined",
                 {
                     directionX: percentageX,
                     directionY: percentageY,
@@ -160,7 +160,7 @@
 
             $("#direction-box").mouseleave(function(e) {
               console.log("Out of the pad");;
-              $.post("/control/direction/stop",
+              $.post("{{ swarm_ip }}/control/direction/stop",
               {
                   frequencyX: {{ servo_x_start }},
                   frequencyY: {{ servo_y_start }},
@@ -281,7 +281,15 @@
               $.post('/control/direction/right');
             });
             $('#direction_stop').click(function() {
-              $.post('/control/direction/stop');
+              $.post('http://{{ swarm_ip }}/control/direction/stop');
+              // $.ajax({
+              //     type: 'POST',
+              //     url: 'http://{{ swarm_ip }}/control/direction/stop'
+              //     // ,
+              //     // dataType: 'json'
+              //     // ,
+              //     // contentType: "application/json; charset=utf-8"
+              // });
             });
 
             // Setup view directions
