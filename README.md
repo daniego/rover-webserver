@@ -6,7 +6,7 @@ This is container to serve the amin web content
 docker build -t rover-webserver .
 
 # Login into the container
-docker run -it -p 80:80 -p 8089:8089 -v /my_project_repos/rover-webserver:/srv/rover-webserver --entrypoint="bash" rover-webserver
+docker run -it -p 80:80 -p 443:443 -p 8089:8089 -v /my_project_repos/rover-webserver:/srv/rover-webserver --entrypoint="bash" rover-webserver
 docker run -it -p 80:80 -p 8089:8089 -v /my_project_repos/rover-webserver:/srv/rover-webserver rover-webserver
 # Get camera info
 Note: the camera is not recognized in live mode

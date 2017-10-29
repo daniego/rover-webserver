@@ -68,5 +68,4 @@ def thing():
 # Start the flask debug server listening on the pi port 5000 by default.
 if __name__ == "__main__":
 #
-    app.run(host='0.0.0.0', port=8089, debug=True, threaded=True, ssl_context='adhoc')
-    # app.run(host='0.0.0.0', port=8089, debug=False, threaded=True)
+    app.run(host='0.0.0.0', port=8089, debug=False, threaded=True)
