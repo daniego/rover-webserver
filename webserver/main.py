@@ -41,8 +41,8 @@ def view(service):
         return render_template('driver-mobile.html', switch=switch)
     elif service == 'cardboard':
         return render_template('cardboard.html')
-    elif service == 'web-bluetooth-demo':
-        return render_template('web-bluetooth-demo.html')
+    elif service == 'web-bluetooth-rename':
+        return render_template('web-bluetooth-rename.html')
     elif service == 'web-bluetooth-demo2':
         return render_template('web-bluetooth-demo2.html')
     else:
@@ -68,4 +68,5 @@ def thing():
 # Start the flask debug server listening on the pi port 5000 by default.
 if __name__ == "__main__":
 #
-    app.run(host='0.0.0.0', port=8089, debug=False, threaded=True)
+    # app.run(host='0.0.0.0', port=8089, debug=False, threaded=True)
+    app.run(host='0.0.0.0', port=8089, debug=True, threaded=True, ssl_context='adhoc')
