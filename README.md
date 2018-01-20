@@ -17,3 +17,6 @@ ptpcam -l
 
 
 /etc/ssl/private/nginx-selfsigned.key
+
+# TODO
+set BLE service and characteristics via environment variable
