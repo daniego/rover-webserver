@@ -43,6 +43,8 @@ def view(service):
         return render_template('cardboard.html')
     elif service == 'web-bluetooth-rename':
         return render_template('web-bluetooth-rename.html')
+    elif service == 'glove-controller-raw':
+        return render_template('glove-controller-raw.html')
     elif service == 'web-bluetooth-get':
         return render_template('web-bluetooth-get.html')
     elif service == 'web-bluetooth-get2':
@@ -75,4 +77,4 @@ def thing():
 if __name__ == "__main__":
 #
     # app.run(host='0.0.0.0', port=8089, debug=False, threaded=True)
-    app.run(host='0.0.0.0', port=8089, debug=True, threaded=True, ssl_context='adhoc')
+    app.run(host='0.0.0.0', port=8089, debug=True, threaded=True, ssl_context=('ssl/cert.pem', 'ssl/key.pem'))

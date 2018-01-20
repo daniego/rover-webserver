@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+        <script src="{{ url_for('static', filename='demos/bluetooth-rename/bower_components/webcomponentsjs/webcomponents-lite.min.js') }}"></script>
+
+        <!-- Polymer components -->
+        <link rel="import" href="{{ url_for('static', filename='demos/bluetooth-rename/bower_components/paper-button/paper-button.html') }}">
+        <link rel="import" href="{{ url_for('static', filename='demos/bluetooth-rename/bower_components/paper-card/paper-card.html') }}">
+        <link rel="import" href="{{ url_for('static', filename='demos/bluetooth-rename/bower_components/paper-dialog/paper-dialog.html') }}">
+        <link rel="import" href="{{ url_for('static', filename='demos/bluetooth-rename/bower_components/paper-input/paper-input.html') }}">
+        <link rel="import" href="{{ url_for('static', filename='demos/bluetooth-rename/bower_components/paper-progress/paper-progress.html') }}">
+
+        <link rel="import" href="{{ url_for('static', filename='demos/bluetooth-rename/bower_components/paper-styles/color.html') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='demos/bluetooth-rename/bower_components/paper-styles/demo.css') }}">
+
+        <style is="custom-style">
+          paper-button {
+            display: block;
+            margin-bottom: 24px;
+          }
+          paper-button.colorful {
+            color: #4285f4;
+          }
+          paper-button[raised].colorful {
+            background: #4285f4;
+            color: #fff;
+          }
+          paper-button[toggles] {
+            transition: background-color 0.3s;
+          }
+          paper-button[toggles][active] {
+            background-color: rgba(0, 0, 0, 0.25);
+          }
+          paper-button[toggles][active].colorful {
+            background-color: rgba(66, 133, 244, 0.25);
+          }
+          paper-button[toggles][active][raised].colorful {
+            background-color: rgba(66, 133, 244, 0.75);
+          }
+          paper-button.blue {
+            color: var(--paper-light-blue-500);
+            paper-button-flat-focus-color: var(--paper-light-blue-50);
+          }
+          body {
+            background-color: var(--paper-grey-50);
+          }
+          #cards {
+            margin-left: auto;
+            margin-right: auto;
+            max-width: 400px;
+          }
+          paper-card {
+            margin-bottom: 16px;
+            width: 100%;
+          }
+          paper-progress {
+            width: 100%;
+          }
+        </style>
+
+
+
+
+    </head>
+    <body>
+        <div class="jumbotron">
+          <div class="container">
+            <h1>web-bluetooth-demo</h1>
+          </div>
+        </div>
+
+
+        <div id="cards">
+          <paper-card heading="Bluetooth Rename Tool">
+            <div class="card-content">
+              <paper-progress id="progress" indeterminate hidden="true"></paper-progress>
+            </div>
+          </paper-card>
+
+          <paper-card>
+            <div class="card-content">
+              <div id="sensor1-value"></div>
+              <div id="sensor2-value"></div>
+              <paper-button id="startButton" raised class="colorful">Start</paper-button>
+            </div>
+          </paper-card>
+
+          <paper-dialog id="errorDialog">
+            <h2>Error</h2>
+            <p id="dialogError">Could not connect to bluetooth device!</p>
+          </paper-dialog>
+
+          <paper-dialog id="doneDialog">
+            <h2>Done!</h2>
+          </paper-dialog>
+        </div>
+        <script src="{{ url_for('static', filename='js/jquery-1.12.4.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/jquery-ui-1.12.1.js') }}"></script>
+<script>
+document.addEventListener('WebComponentsReady', function() {
+    startButton.addEventListener('click', function () {
+
+      navigator.bluetooth.requestDevice({ filters: [{ services: ['33332a58-0000-1000-8000-00805f9b34fb'] }] })
+      .then(device => device.gatt.connect())
+      .then(server => server.getPrimaryService('33332a58-0000-1000-8000-00805f9b34fb'))
+
+      // Sensor 1
+      .then(service => service.getCharacteristic('33332a58-0000-1000-8000-00805f9b34fb'))
+      .then(characteristic => characteristic.startNotifications())
+      .then(characteristic => { characteristic.addEventListener(  'characteristicvaluechanged',
+                                                                   handleCharacteristicValueChanged1);
+                                                                   console.log('Notifications have been started.'
+                                                                );
+      })
+
+      // .then(value => {
+      //   console.log('Sensor1 is  ' + value.getUint8(0));
+      // })
+      //
+
+      // // Sensor 2
+      // .then(service => service.getCharacteristic('33332a58-0000-1000-8000-00805f9b34fc'))
+      // .then(characteristic => characteristic.startNotifications())
+      // .then(characteristic => {
+      //                           characteristic.addEventListener(  'characteristicvaluechanged',
+      //                                                             handleCharacteristicValueChanged2);
+      //                                                             console.log('Notifications have been started.'
+      //                                                           );
+      // })
+
+      // .then(value => {
+      //   console.log('Sensor2 is  ' + value.getUint8(0));
+      // })
+      // .catch(error => { console.log(error); });
+
+
+      .catch(error => { console.log(error); });
+
+      function handleCharacteristicValueChanged1(event) {
+        // var value = event.target.value.getUint8(0);
+        var value = event.target.value.getInt8(0);
+        // $('.sensor1-value').append(value);
+        var divele = document.getElementById("sensor1-value") ;
+
+        divele.innerHTML= value ;
+        console.log('Received Sensor 1' + value);
+
+        // Send POST-request with any data
+        $.ajax({
+            url: 'https://192.168.1.128:8099/controls/direction/glove',
+            type: 'POST',
+            data: { sensor1: value,
+                    city: "Duckburg" },
+            dataType: 'application/json'
+        }).always(function (json) {
+            console.log(json); // Oops, this is a string `res: "bar"`
+        });
+
+        $.post("https://192.168.1.128:8099/controls/direction/glove",{
+          sensor1: value,
+          city: "Duckburg"
+        });
+        //
+        // xhttp.open("POST", "ajax_test.asp", true);
+        // xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        // xhttp.send("fname=Henry&lname=Ford");
+
+        // TODO: Parse Heart Rate Measurement value.
+        // See https://github.com/WebBluetoothCG/demos/blob/gh-pages/heart-rate-sensor/heartRateSensor.js
+      }
+
+      function handleCharacteristicValueChanged2(event) {
+        var value = event.target.value.getUint8(0);
+        // $('.sensor1-value').append(value);
+        var divele = document.getElementById("sensor2-value") ;
+
+        divele.innerHTML= value ;
+        console.log('Received Sensor2' + value[0]);
+        $.post("demo_test.asp", function(data, status){
+            alert("Data: " + data + "\nStatus: " + status);
+        });
+        // TODO: Parse Heart Rate Measurement value.
+        // See https://github.com/WebBluetoothCG/demos/blob/gh-pages/heart-rate-sensor/heartRateSensor.js
+      }
+
+
+    });
+});
+
+</script>
+
+    </body>
+</html>
