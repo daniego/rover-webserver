@@ -43,6 +43,12 @@ def view(service):
         return render_template('cardboard.html')
     elif service == 'web-bluetooth-rename':
         return render_template('web-bluetooth-rename.html')
+    elif service == 'web-bluetooth-get':
+        return render_template('web-bluetooth-get.html')
+    elif service == 'web-bluetooth-get2':
+        return render_template('web-bluetooth-get2.html')
+    elif service == 'web-bluetooth-get3':
+        return render_template('web-bluetooth-get3.html')
     elif service == 'web-bluetooth-demo2':
         return render_template('web-bluetooth-demo2.html')
     else:
