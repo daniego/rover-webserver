@@ -144,27 +144,30 @@ document.addEventListener('WebComponentsReady', function() {
 
       function handleCharacteristicValueChanged1(event) {
         // var value = event.target.value.getUint8(0);
-        var value = event.target.value.getInt8(0);
+        // var value = event.target.value.getUint8(0); // stops at 8bit getting up to 255
+        var value = event.target.value.getUint8(0);
         // $('.sensor1-value').append(value);
         var divele = document.getElementById("sensor1-value") ;
 
         divele.innerHTML= value ;
-        console.log('Received Sensor 1' + value);
+        console.log('Received Sensor 1: ' + value);
+        console.log('Received Sensor 1 FULL: ' + event.target.value);
 
-        // Send POST-request with any data
-        $.ajax({
-            url: 'https://192.168.1.128:8099/controls/direction/glove',
-            type: 'POST',
-            data: { sensor1: value,
-                    city: "Duckburg" },
-            dataType: 'application/json'
-        }).always(function (json) {
-            console.log(json); // Oops, this is a string `res: "bar"`
-        });
+        // // Send POST-request with any data
+        // $.ajax({
+        //     url: 'https://192.168.1.128:8099/controls/direction/glove',
+        //     type: 'POST',
+        //     data: { sensor1: value,
+        //             full: event.target.value },
+        //     dataType: 'application/json'
+        // }).always(function (json) {
+        //     console.log(json); // Oops, this is a string `res: "bar"`
+        // });
 
-        $.post("https://192.168.1.128:8099/controls/direction/glove",{
+        $.post("https://192.168.1.115:8099/controls/direction/glove",{
           sensor1: value,
-          city: "Duckburg"
+          // city: "Duckburg",
+          full: event.target.value
         });
         //
         // xhttp.open("POST", "ajax_test.asp", true);
