@@ -1,10 +1,6 @@
 FROM resin/rpi-raspbian
 MAINTAINER Daniel Floris <daniel.floris@gmail.com>
 
-# RUN echo "deb http://nginx.org/packages/mainline/debian/ codename nginx" >> /etc/apt/sources.list.d/nginx.list
-# RUN echo "deb-src http://nginx.org/packages/mainline/debian/ codename nginx" >> /etc/apt/sources.list.d/nginx.list
-
-
 RUN apt-get update && \
     apt-get install -y \
     nginx \
@@ -13,17 +9,12 @@ RUN apt-get update && \
     # dev tools
     vim
 
-ADD webserver/requirements.txt /srv/rover-webserver/requirements.txt
-RUN python3 -m venv /opt/rover-webserver && \
-    cd /srv/rover-webserver && \
-    /opt/rover-webserver/bin/pip install -r requirements.txt
-
-RUN echo "source /opt/rover-webserver/bin/activate" >> /root/.bashrc
-
-RUN rm /etc/nginx/sites-enabled/default
-
 ADD container_fs /
 ADD webserver/ /srv/rover-webserver/webserver
+RUN python3 -m venv /opt/rover-webserver && \
+    /opt/rover-webserver/bin/pip install -r /srv/rover-webserver/requirements.txt && \
+    echo "source /opt/rover-webserver/bin/activate" >> /root/.bashrc && \
+    rm /etc/nginx/sites-enabled/default
 
 WORKDIR /srv/rover-webserver
 
