@@ -1,0 +1,17 @@
+version: '3'
+services:
+  webserver:
+    build:
+      dockerfile: Dockerfile-x86
+      context: .
+    image: daniego/rover-webserver:latest-x86
+    ports:
+      - 80:80
+      - 443:443
+      - 8089:8089
+    environment:
+      UV4L_HOST:    '192.168.178.10'
+      ENGINE_HOST:  '192.168.178.10:8089'
+    volumes:
+      - .:/srv/rover-webserver
+      - ./container_fs/docker-entrypoint.sh:/docker-entrypoint.sh

@@ -1,4 +1,4 @@
-FROM resin/rpi-raspbian
+FROM ubuntu:xenial
 MAINTAINER Daniel Floris <daniel.floris@gmail.com>
 
 RUN apt-get update && \
@@ -6,21 +6,24 @@ RUN apt-get update && \
     nginx \
     python3 \
     python3-venv \
+    python3-dev \
+    libssl-dev \
+    gcc \
+    libffi-dev \
+    supervisor \
+    gettext-base \
     # dev tools
     vim
 
-ADD container_fs /
 ADD webserver/ /srv/rover-webserver/webserver
 
-RUN python3 -m venv /opt/rover-webserver
-# && \
-RUN apt install -y gcc libffi-dev
-RUN /opt/rover-webserver/bin/pip install --upgrade pip setuptools
-RUN apt install -y python3-dev
-RUN apt install -y libssl-dev
-RUN    /opt/rover-webserver/bin/pip install -r /srv/rover-webserver/webserver/requirements.txt && \
+RUN python3 -m venv /opt/rover-webserver && \
+    /opt/rover-webserver/bin/pip install --upgrade pip setuptools && \
+    /opt/rover-webserver/bin/pip install -r /srv/rover-webserver/webserver/requirements.txt && \
     echo "source /opt/rover-webserver/bin/activate" >> /root/.bashrc && \
     rm /etc/nginx/sites-enabled/default
+
+ADD container_fs /
 
 WORKDIR /srv/rover-webserver
 
