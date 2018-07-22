@@ -1,13 +1,12 @@
 from flask import *
 import os
 
-# print(os.getenv('SWARM_IP'))
-# print(os.environ.get('SWARM_IP'))
-#
-# # SWARM_IP = os.environ.get("SWARM_IP") + ":8099"
-# # SWARM_IP = sSWARM_IP)
-# print(SWARM_IP)
-# define servo range
+import logging
+from logging.handlers import RotatingFileHandler
+
+UV4L_HOST = os.environ.get('UV4L_HOST')
+ENGINE_HOST = os.environ.get('ENGINE_HOST')
+
 SERVO_X_MIN = 730
 SERVO_X_MAX = 3200
 SERVO_X_START = 1950
@@ -28,15 +27,17 @@ def index():
 @app.route("/view/<path:service>", methods=['GET'])
 def view(service):
     # print service
-    if service == 'driver/full':
-        return render_template('driver-full.html',
-                                swarm_ip=SWARM_IP,
+    if service == 'web/fixed':
+        return render_template('view_web.html',
+                                uv4l_host=UV4L_HOST,
+                                engine_host=ENGINE_HOST,
                                 servo_y_min=SERVO_Y_MIN,
                                 servo_y_max=SERVO_Y_MAX,
                                 servo_y_start=SERVO_Y_START,
                                 servo_x_min=SERVO_X_MIN,
                                 servo_x_max=SERVO_X_MAX,
-                                servo_x_start=SERVO_X_START)
+                                servo_x_start=SERVO_X_START
+                                )
     elif service == 'driver/mobile':
         return render_template('driver-mobile.html', switch=switch)
     elif service == 'cardboard':
@@ -76,5 +77,7 @@ def thing():
 # Start the flask debug server listening on the pi port 5000 by default.
 if __name__ == "__main__":
 #
-    # app.run(host='0.0.0.0', port=8089, debug=False, threaded=True)
-    app.run(host='0.0.0.0', port=8089, debug=True, threaded=True, ssl_context=('ssl/cert.pem', 'ssl/key.pem'))
+    app.logger.addHandler(logging.StreamHandler())
+    app.logger.setLevel(logging.INFO)
+    app.run(host='0.0.0.0', port=8089, debug=True, threaded=True)
+    # app.run(host='0.0.0.0', port=8089, debug=True, threaded=True, ssl_context=('ssl/cert.pem', 'ssl/key.pem'))

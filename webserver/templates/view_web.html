@@ -38,50 +38,33 @@
                 <p>Hello world! Welcome to my internet thing!</p>
             </div>
         </div>
-
+        --- System snippet ---
+        camera host {{ uv4l_host }}
+        engine_host {{ engine_host }}
         <div class="container">
             <div class="row">
-                <div class="col-md-4">
+                <div class="col-md-6">
+                  <h3>Camera</h3>
+                  <!-- <iframe class="cardboard-iframe" src="http://{{ uv4l_host }}/stream?width=640&height=480"></iframe> -->
+                  <iframe class="cardboard-iframe" src="http://{{ uv4l_host }}/stream/video.mjpeg "></iframe>
+                </div>
+                <div class="col-md-6">
                     <h3>Direction</h3>
+                    <br>
+                    <br>
+                    <br>
+
                     <button class="btn btn-default" type='button' id='direction_forward'>Move forward</button>
                     <button class="btn btn-default" type='button' id='direction_backward'>Move backward</button>
+                    <br>
+                    <br>
                     <button class="btn btn-default" type='button' id='direction_left'>Move left</button>
                     <button class="btn btn-default" type='button' id='direction_right'>Move right</button>
                     <button class="btn btn-default" type='button' id='direction_stop'>Move stop</button>
                     <div id="direction-box"></div>
                 </div>
 
-                <div class="col-md-4">
-                  <h3>Camera host {{ uv4l_host }}</h3>
-                </div>
-                <div class="col-md-4">
-                    <h3>View</h3>
-                    <button class="btn btn-default" type='button' id='view_up'>View up</button>
-                    <button class="btn btn-default" type='button' id='view_down'>View down</button>
-                    <button class="btn btn-default" type='button' id='view_left'>View left</button>
-                    <button class="btn btn-default" type='button' id='view_right'>View right</button>
 
-                    <div class="view-controls">
-
-                        <!-- <p>
-                          <label for="vposition">Vertical:</label>
-                          <input type="text" id="vposition" readonly style="border:0; color:#f6931f; font-weight:bold;">
-                        </p> -->
-                        <div id="slider-vertical"></div>
-
-
-                        <!-- SERVO_V_MIN {{ servo_v_min }}
-                        <label for="positionx">positionx:</label> -->
-                        <!-- <input type="text" id="positionx" readonly style="border:0; color:#f6931f; font-weight:bold;"\> -->
-                        <div id="view-pad"></div>
-
-                        <!-- <p>
-                          <label for="hposition">Horizontal:</label>
-                          <input type="text" id="hposition" readonly style="border:0; color:#f6931f; font-weight:bold;">
-                        </p> -->
-                        <div id="slider-horizontal"></div>
-                    </div>
-                </div>
             </div>
         </div>
 
@@ -144,10 +127,11 @@
               console.log("relativeY: " + relativeY);
               console.log("percentageX: " + percentageX);
               console.log("percentageY: " + percentageY);
+              console.log("engine_host: http://{{ engine_host }}")
               console.log("----------------------------\n");
 
 
-                $.post("{{ swarm_ip }}/control/direction/combined",
+                $.post("http://{{ engine_host }}/controls/direction/combined",
                 {
                     directionX: percentageX,
                     directionY: percentageY,
@@ -160,7 +144,7 @@
 
             $("#direction-box").mouseleave(function(e) {
               console.log("Out of the pad");;
-              $.post("{{ swarm_ip }}/control/direction/stop",
+              $.post("http://{{ engine_host }}/controls/direction/stop",
               {
                   frequencyX: {{ servo_x_start }},
                   frequencyY: {{ servo_y_start }},
@@ -237,14 +221,14 @@
               console.log("----------------------------\n");
 
 
-                $.post("/control/view/combined",
-                {
-                    frequencyX: frequencyX,
-                    frequencyY: frequencyY,
-                },
-                function(data, status){
-                    //alert("Data: " + data + "\nStatus: " + status);
-                });
+              $.post("http://{{ engine_host }}/controls/view/combined",
+              {
+                  frequencyX: frequencyX,
+                  frequencyY: frequencyY,
+              },
+              function(data, status){
+                  //alert("Data: " + data + "\nStatus: " + status);
+              });
 
             });
 
@@ -253,7 +237,7 @@
               console.log("X: 0");
               console.log("Y: 0");
               console.log("----------------------------\n");
-              $.post("/control/view/reset",
+              $.post("/controls/view/reset",
               {
                   frequencyX: {{ servo_x_start }},
                   frequencyY: {{ servo_y_start }},
@@ -269,22 +253,22 @@
 
             // Setup control directions
             $('#direction_forward').click(function() {
-              $.post('/control/direction/forward');
+              $.post('http://{{ engine_host }}/controls/direction/forward');
             });
             $('#direction_backward').click(function() {
-              $.post('/control/direction/backward');
+              $.post('http://{{ engine_host }}/controls/direction/backward');
             });
             $('#direction_left').click(function() {
-              $.post('/control/direction/left');
+              $.post('http://{{ engine_host }}/controls/direction/left');
             });
             $('#direction_right').click(function() {
-              $.post('/control/direction/right');
+              $.post('http://{{ engine_host }}/controls/direction/right');
             });
             $('#direction_stop').click(function() {
-              $.post('http://{{ swarm_ip }}/control/direction/stop');
+              $.post('http://{{ engine_host }}/controls/direction/stop');
               // $.ajax({
               //     type: 'POST',
-              //     url: 'http://{{ swarm_ip }}/control/direction/stop'
+              //     url: 'http://{{ swarm_ip }}/controls/direction/stop'
               //     // ,
               //     // dataType: 'json'
               //     // ,
@@ -294,16 +278,16 @@
 
             // Setup view directions
             $('#view_up').click(function() {
-              $.post('/control/view/up');
+              $.post('/controls/view/up');
             });
             $('#view_down').click(function() {
-              $.post('/control/view/down');
+              $.post('/controls/view/down');
             });
             $('#view_left').click(function() {
-              $.post('/control/view/left');
+              $.post('/controls/view/left');
             });
             $('#view_right').click(function() {
-              $.post('/control/view/right');
+              $.post('/controls/view/right');
             });
 
             console.log( "readyv" );
@@ -320,7 +304,7 @@
               slide: function( event, ui ) {
                 // Doing the fun!!!
                 var yyy = ui.value;
-                $.post("/control/view/combined",
+                $.post("http://{{ engine_host }}/controls/view/combined",
                 {
                     frequencyY: ui.value,
                     frequencyX: 700
@@ -346,7 +330,7 @@
               //step: 1,
               slide: function( event, ui, yyy ) {
                 // Doing the fun!!!
-                $.post("/control/view/combined",
+                $.post("http://{{ engine_host }}/controls/view/combined",
                 {
                     frequencyX: ui.value,
                     frequencyY: 700,
