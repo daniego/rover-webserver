@@ -220,15 +220,19 @@
               console.log("frequencyX: " + frequencyX);
               console.log("----------------------------\n");
 
+              setTimeout(function() {   //calls click event after a certain time
 
-              $.post("http://{{ engine_host }}/controls/view/combined",
-              {
-                  frequencyX: frequencyX,
-                  frequencyY: frequencyY,
-              },
-              function(data, status){
-                  //alert("Data: " + data + "\nStatus: " + status);
-              });
+                $.post("http://{{ engine_host }}/controls/view/combined",
+                {
+                    frequencyX: frequencyX,
+                    frequencyY: frequencyY,
+                },
+                function(data, status){
+                    //alert("Data: " + data + "\nStatus: " + status);
+                });
+
+              }, 200);
+
 
             });
 
