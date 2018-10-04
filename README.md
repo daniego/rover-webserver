@@ -1,6 +1,6 @@
 # rover-webserver
 
-This is container to serve the amin web content
+This is container to serve the admin web content
 
 # Build local container
 docker build -t rover-webserver .
