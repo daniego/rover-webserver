@@ -85,6 +85,7 @@
 
           <paper-card>
             <div class="card-content">
+              <div id="sensor-values"></div>
               <div id="sensor1-value"></div>
               <paper-button id="startButton" raised class="colorful">Start</paper-button>
               <div id="sensor2-value"></div>
@@ -119,35 +120,65 @@
 document.addEventListener('WebComponentsReady', function() {
     startButton.addEventListener('click', function () {
 
+    const currentValues = {
+      first: null,
+      second: null
+    }
+
+    const getValue = event => event.target.value.getUint8(0);
+
+    const updateValues = type => event => {
+      currentValues[type] = getValue(event)
+      updateHtml()
+      fetch('https://daniego2.hopto.org/update', {
+          method: 'POST',
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'content-type': 'application/json'
+
+          },
+          body: JSON.stringify(currentValues)
+        })
+        .then(console.log)
+        .catch(console.error)
+    }
+
       navigator.bluetooth.requestDevice({ filters: [{ services: ['33332a58-0000-1000-8000-00805f9b34ff'] }] })
       .then(device => device.gatt.connect())
       .then(server => server.getPrimaryService('33332a58-0000-1000-8000-00805f9b34ff'))
-      .then(service => service.getCharacteristic('33332a58-0000-1000-8000-00805f9b34aa'))
+      .then(async service => {
+          const first = await service.getCharacteristic('33332a58-0000-1000-8000-00805f9b34aa')
+          await first.startNotifications()
+          first.addEventListener('characteristicvaluechanged', updateValues('first'));
+
+          const second = await service.getCharacteristic('33332a58-0000-1000-8000-00805f9b34bb')
+          await second.startNotifications()
+          second.addEventListener('characteristicvaluechanged', updateValues('second'));
+
+          // return handleCharacteristicValueChanged({ first, second })
+      })
+      // .then(service => service.getCharacteristic('33332a58-0000-1000-8000-00805f9b34aa'))
+      // .then(characteristic => characteristic.readValue())
       // .then(service => service.getCharacteristic('00001525-1212-efde-1523-785feabcd123'))
-      .then(characteristic => characteristic.startNotifications())
-      .then(characteristic => {
-        // return characteristic.readValue();
-        characteristic.addEventListener('characteristicvaluechanged',
-                                        handleCharacteristicValueChanged);
-        console.log('Notifications have been started.');
-      })
-      .then(value => {
-        // console.log('Battery percentage is ' + value.getUint8(0));
-        console.log('Battery percentage is ' + value);
-      })
+      // .then(characteristic => characteristic.startNotifications())
+      // .then(characteristic => {
+      //   // return characteristic.readValue();
+      //   characteristic.addEventListener('characteristicvaluechanged',
+      //                                   handleCharacteristicValueChanged);
+      //   console.log('Notifications have been started.');
+      // })
       .catch(error => { console.log(error); });
 
-      function handleCharacteristicValueChanged(event) {
-        var value = event.target.value.getUint8(0);
+      function updateHtml() {
+        document.getElementById('sensor-values').innerText = `Sensor: ${currentValues.first} ${currentValues.second}`;
+        // <div id="sensor2-value"></div>
+        // document.getElementById("sensor2-value").innerText = "Sensor 2: " + value.second ;
 
-        document.getElementById("sensor1-value").innerText = "Sensor 1: " + value ;
-        document.getElementById("sensor2-value").innerText = "Sensor 2: " + value ;
-
-        var divele = document.getElementById("sensor1-value") ;
+        // var divele = document.getElementById("sensor1-value") ;
 
         // divele.innerHTML= value ;
         // console.log('Received ' + value[0]);
-        console.log('Received ' + value );
+        console.log('Received ' + currentValues );
         // TODO: Parse Heart Rate Measurement value.
         // See https://github.com/WebBluetoothCG/demos/blob/gh-pages/heart-rate-sensor/heartRateSensor.js
       }

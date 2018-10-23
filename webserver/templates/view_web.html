@@ -39,14 +39,14 @@
             </div>
         </div>
         --- System snippet ---
-        camera host {{ uv4l_host }}
+        camera host {{ uv4l_host }}:{{ uv4l_port }}
         engine_host {{ engine_host }}
         <div class="container">
             <div class="row">
                 <div class="col-md-6">
                   <h3>Camera</h3>
                   <!-- <iframe class="cardboard-iframe" src="http://{{ uv4l_host }}/stream?width=640&height=480"></iframe> -->
-                  <iframe class="cardboard-iframe" src="http://{{ uv4l_host }}/stream/video.mjpeg "></iframe>
+                  <iframe class="cardboard-iframe" src="http://{{ uv4l_host }}:{{ uv4l_port }}/stream/video.mjpeg "></iframe>
                 </div>
                 <div class="col-md-6">
                     <h3>Direction</h3>

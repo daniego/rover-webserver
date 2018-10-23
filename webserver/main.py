@@ -5,6 +5,7 @@ import logging
 from logging.handlers import RotatingFileHandler
 
 UV4L_HOST = os.environ.get('UV4L_HOST')
+UV4L_PORT = os.environ.get('UV4L_PORT')
 ENGINE_HOST = os.environ.get('ENGINE_HOST')
 
 SERVO_X_MIN = 730
@@ -24,12 +25,26 @@ app = Flask(__name__)
 def index():
     return render_template('index.html')
 
+# @app.route('/update')
+# def show_post():
+#     # show the post with the given id, the id is an integer
+#     return ('OK', 200)
+#     # return 'Post '
+
+
+@app.route('/update', methods=['POST'])
+def show_post():
+    # show the post with the given id, the id is an integer
+    print('First: %i, Second: %s' % (request.json['first'], request.json['second']) )
+    return 'Post %s' % request.json
+
 @app.route("/view/<path:service>", methods=['GET'])
 def view(service):
     # print service
     if service == 'web/fixed':
         return render_template('view_web.html',
                                 uv4l_host=UV4L_HOST,
+                                uv4l_port=UV4L_PORT,
                                 engine_host=ENGINE_HOST,
                                 servo_y_min=SERVO_Y_MIN,
                                 servo_y_max=SERVO_Y_MAX,
@@ -52,6 +67,8 @@ def view(service):
         return render_template('web-bluetooth-get2.html')
     elif service == 'web-bluetooth-get3':
         return render_template('web-bluetooth-get3.html')
+    elif service == 'web-bluetooth-get3_flavio':
+        return render_template('web-bluetooth-get3_flavio.html')
     elif service == 'web-bluetooth-demo2':
         return render_template('web-bluetooth-demo2.html')
     else:

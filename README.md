@@ -9,7 +9,7 @@ docker build -t rover-webserver .
 # Run container
 
 # Run container with local code
-docker run -it -p 80:80 -p 443:443 -p 8089:8089 -v `pwd`:/srv/rover-webserver -v `pwd`/container_fs/etc/nginx/nginx80.template:/etc/nginx/nginx80.template -e UV4L_HOST="192.168.178.101" -e ENGINE_HOST="192.168.178.242:8089" rover-webserver
+docker run -it -p 8088:80 -p 8089:8089 -v `pwd`:/srv/rover-webserver -v `pwd`/container_fs/etc/nginx/nginx80.template:/etc/nginx/nginx80.template -e UV4L_HOST="192.168.0.100" -e UV4L_PORT=40888 -e ENGINE_HOST="192.168.178.242:8089" rover-webserver
 
 # Run and login
 
