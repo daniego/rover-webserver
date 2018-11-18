@@ -19,40 +19,31 @@ SERVO_Y_START = 1450
 # Create flask app and global pi 'thing' object.
 app = Flask(__name__)
 
+# Defining global variables
+@app.context_processor
+def utility_processor():
+    return dict(uv4l_host=UV4L_HOST,
+                uv4l_port=UV4L_PORT,
+                engine_host=ENGINE_HOST,
+                servo_y_min=SERVO_Y_MIN,
+                servo_y_max=SERVO_Y_MAX,
+                servo_y_start=SERVO_Y_START,
+                servo_x_min=SERVO_X_MIN,
+                servo_x_max=SERVO_X_MAX,
+                servo_x_start=SERVO_X_START
+                )
+
 # Define app routes.
 # Index route renders the main HTML page.
 @app.route("/")
 def index():
     return render_template('index.html')
 
-# @app.route('/update')
-# def show_post():
-#     # show the post with the given id, the id is an integer
-#     return ('OK', 200)
-#     # return 'Post '
-
-
-@app.route('/update', methods=['POST'])
-def show_post():
-    # show the post with the given id, the id is an integer
-    print('First: %i, Second: %s' % (request.json['first'], request.json['second']) )
-    return 'Post %s' % request.json
-
 @app.route("/view/<path:service>", methods=['GET'])
 def view(service):
     # print service
     if service == 'web/fixed':
-        return render_template('view_web.html',
-                                uv4l_host=UV4L_HOST,
-                                uv4l_port=UV4L_PORT,
-                                engine_host=ENGINE_HOST,
-                                servo_y_min=SERVO_Y_MIN,
-                                servo_y_max=SERVO_Y_MAX,
-                                servo_y_start=SERVO_Y_START,
-                                servo_x_min=SERVO_X_MIN,
-                                servo_x_max=SERVO_X_MAX,
-                                servo_x_start=SERVO_X_START
-                                )
+        return render_template('view_web.html')
     elif service == 'driver/mobile':
         return render_template('driver-mobile.html', switch=switch)
     elif service == 'cardboard':
